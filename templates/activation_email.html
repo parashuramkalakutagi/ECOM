@@ -1,0 +1,88 @@
+{% autoescape off %}
+
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Darker Grotesque' rel='stylesheet'>
+</head>
+
+<style>
+    body{
+        font-family: 'Darker Grotesque';font-size: 22px;
+    }
+</style>
+
+
+<body style="background-color:#e7e7e7" >
+    <br>
+    <br>
+    <br>
+    <div style="width: 80%;margin: auto;">
+        <div style="background-color: white;padding-right: 60px;padding-left: 60px; border-radius: 5px;min-width: 580px;" >
+            <div style="text-align: center;">
+                <img style="text-align: center; background-color: white;padding-top: 10px;" src="https://midc-midpay-s3-storage.s3.me-south-1.amazonaws.com/img/logo_full_dark.png">
+            </div>
+
+            <div style="padding-left:15px ;padding-right:15px ;">
+            <br>
+            <br>
+            <br>
+            Dear {{ user | title}},
+            <br>
+            <br>
+            To initiate the email verification process for your account on <a href="{{ protocol }}://{{ domain }}/otc/">MidChains OTC</a>,
+            click the link below:
+            <br><br>
+            <div style="text-align: center;">
+                <a style="padding: 10px;color:white;background-color:#FF1471;text-decoration:none;border-radius:5px" href="{{ protocol }}://{{ domain }}{% url 'activate' uidb64=uid token=token %}">
+                    Verify Email
+                </a>
+            </div>
+            <br><br>
+            If clicking the link above doesn't work, please copy and paste the URL in a new browser
+            window instead.
+            <br>
+            <br>
+            <a style="text-decoration: none;color:#FF1471" href="{{ protocol }}://{{ domain }}{% url 'activate' uidb64=uid token=token %}">
+                {{ protocol }}://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+            </a>
+            <br>
+            <br>
+            If you require further assistance please reach out to us at any of our supports channels <a style="text-decoration: none;color:#FF1471" href="https://midchains.com/support/">here</a>.
+            <br>
+            <br>
+            Thank you,<br>
+            MidChains Team
+            <br>
+            <br>
+            <img style="float : right;margin: 10px 15px 5px 5px;" src="https://midchains.com/img/favicon.png">
+            <!-- </div> -->
+            
+            <footer style="text-align: center;padding-bottom: 15px;">
+                <br>
+                <br>
+                <div class="container disclaimer" style="padding-bottom: 15px;">
+                    <p style="text-align: center;color: grey;">
+                        <small>
+                            <br>
+                            <br>
+                            <br>
+                            Purchasing, holding and trading Virtual assets may not be suitable for everyone, so please ensure that you fully understand the risks involved. 
+                            MidChains does not issue advice, recommendations or opinion in relation to acquiring, holding or trading a virtual assets. MidChains is not a financial advisor, 
+                            and all services are provided on an execution only basis. The information on this site is not directed at residents of United States, or use by any person in any 
+                            country or jurisdiction where such distribution or use would be contrary to local law or regulation.
+                        </small>       
+                    </p>
+                </div>
+            
+                <div style="position:relative;right:10;bottom:50;margin:0;padding:0;">
+                           
+                </div>
+            </footer>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>    
+</body>
+{% endautoescape %}

@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+
+  app:
+    build: .
+    volumes:
+      - .:/django_rest
+    ports:
+      - 8000:8000
+    image: app:django_rest
+    container_name: rest_docker
+    command: gunicorn ecom.wsgi --bind 0.0.0.0:8000
+
+  nginx:
+    build: ./nginx
+    volumes:
+      - .:/django_rest
+      - ./src:/src  # for syncing with django source code
+      - ./config/nginx:/etc/nginx/conf.d
+    image: nginx
+    container_name: nginx_container
+    ports:
+      - 8001:8001
+
+    depends_on:
+      - app
