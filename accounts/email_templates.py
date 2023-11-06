@@ -14,7 +14,7 @@ class EmailTokenTemplates:
         data = {
             'user': user.first_name,
             'token': token,
-            'domain':get_current_site,
+            'domain':settings.DOMAIN,
             'protocol': 'http'
         }
         message = render_to_string('test.html', data)

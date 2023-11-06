@@ -87,11 +87,7 @@ class Profile_Register(viewsets.ViewSet):
                     obj.save()
                     user = Profile.objects.get(email=data['email'])
 
-                    token = RefreshToken.for_user(user).access_token
-                    print(token)
-
                     data = jwt.encode({'email':user.email},key=settings.JWT_SECRET,algorithm='HS256')
-                    print(data)
 
                     EmailTokenTemplates.verify_email(user, data)
 
@@ -107,7 +103,29 @@ class Profile_Register(viewsets.ViewSet):
                 'message': 'Something went wrong.'
             }
             return Response(response_data, status=HTTP_400_BAD_REQUEST)
-        
+
+
+class DeleteEmailUser(viewsets.ViewSet):
+    permission_classes = [AllowAny]
+    def list(self,request,*args,**kwargs):
+        try:
+            token = self.request.GET['token']
+            token_del = jwt.decode(token, settings.JWT_SECRET, algorithms='HS256')
+            user = Profile.objects.get(email=token_del['email'])
+            if user:
+                user.delete()
+                return Response({'msg': 'User Has Been deleted', 'code': 200}, status=HTTP_200_OK)
+            return Response({'msg': 'User Dosent Exist ', "Code": 400}, status=HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)
+            response_data = {
+                'code':HTTP_400_BAD_REQUEST,
+                'error':e,
+                'message':'Something went wrong..!',
+            }
+            return Response(response_data,status=HTTP_400_BAD_REQUEST)
+
+
 
 class EmailVerify(viewsets.ViewSet):
     permission_classes = [AllowAny]
