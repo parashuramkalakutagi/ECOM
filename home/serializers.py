@@ -57,3 +57,8 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = '__all__'
+
+class AmountTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Amount_transaction
+        fields = '__all__'

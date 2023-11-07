@@ -197,32 +197,67 @@ class OrderView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
     def create(self,request,*args,**kwargs):
+        try:
+            data = request.data
+            user = request.user
+            # validate = validate_args(data,['first_name','last_name','email','address','amount',])
+            # if validate:
+            #     return validate
+            order_obj = order.objects.create(
+                user=user,
+                items=Cart.objects.get(uuid=data['items']),
+                first_name=data['first_name'],
+                last_name=data['last_name'],
+                email=data['email'],
+                address=data['address'],
+                ordered='True',
+                amount=data['amount'],
+                currency='INR',
+            )
+            created_orderdata = RazorpayClient.create_order(self, int(data['amount']), data['currency'])
+            order_obj.save()
+            adress = Adress.objects.create(
+                first_name=data['first_name'],
+                last_name=data['last_name'],
+                order_confirmed='True',
+                order_details=order.objects.get(uuid=order_obj.uuid)
+            )
+            adress.save()
+            return Response({'data': created_orderdata, 'Code': 201}, status=HTTP_201_CREATED)
+        except Exception as e:
+            print(e)
+            response_data = {
+                'status_code': HTTP_400_BAD_REQUEST,
+                'error': str(e),
+                'message': 'Something went wrong.'
+            }
+            return Response(response_data, status=HTTP_400_BAD_REQUEST)
+
+class Amount_transactionView(viewsets.ViewSet):
+    def create(self,request,*args,**kwargs):
         data = request.data
         user = request.user
-        # validate = validate_args(data,['first_name','last_name','email','address','amount',])
-        # if validate:
-        #     return validate
-        order_obj = order.objects.create(
-            user = user,
-            items = Cart.objects.get(uuid = data['items']),
-            first_name = data['first_name'],
-            last_name = data['last_name'],
-            email = data['email'],
-            address =data['address'],
-            ordered = 'True',
-            amount =  data['amount'],
-            currency = 'INR',
-        )
-        created_orderdata = RazorpayClient.create_order(self,int(data['amount']),data['currency'])
-        order_obj.save()
-        adress = Adress.objects.create(
-            first_name = data['first_name'],
-            last_name = data['last_name'],
-            order_confirmed = 'True',
-            order_details = order.objects.get(uuid = order_obj.uuid)
-        )
-        adress.save()
-        return Response({'data':created_orderdata,'Code':201},status=HTTP_201_CREATED)
+        data['user'] = user
+        serializer = AmountTransactionSerializer(data=data)
+        if serializer.is_valid():
+            RazorpayClient.verify_payment(
+                razorpay_order_id=serializer.validated_data.get('order_id'),
+                razorpay_singnature=serializer.validated_data.get('signature'),
+                razorpay_payment_id=serializer.validated_data.get('payment_id'),
+            )
+            serializer.save()
+            return Response({'msg':'Transaction is Successfully ','code':201},status=HTTP_201_CREATED)
+        return Response({'msg':'Invalid Transaction'},status=HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+
+
 
 
 
