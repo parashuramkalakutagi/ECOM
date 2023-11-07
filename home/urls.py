@@ -8,6 +8,7 @@ router.register('Category',CategoryView,basename='Category')
 router.register('Products',ProductsView,basename='Products')
 router.register('ProductList',ProductListView,basename='ProductList')
 router.register('Cart',CartView,basename='Cart')
+router.register('OrderView',OrderView,basename='OrderView')
 
 urlpatterns = [
     # path('',MobileView.as_view()),

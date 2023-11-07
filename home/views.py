@@ -17,6 +17,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import mixins
 import re
 
+from .paymentgateway import *
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
 
@@ -191,4 +192,37 @@ class CartView(viewsets.ViewSet):
                 'message': 'Something went wrong.'
             }
             return Response(response_data, status=HTTP_400_BAD_REQUEST)
+
+class OrderView(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    def create(self,request,*args,**kwargs):
+        data = request.data
+        user = request.user
+        # validate = validate_args(data,['first_name','last_name','email','address','amount',])
+        # if validate:
+        #     return validate
+        order_obj = order.objects.create(
+            user = user,
+            items = Cart.objects.get(uuid = data['items']),
+            first_name = data['first_name'],
+            last_name = data['last_name'],
+            email = data['email'],
+            address =data['address'],
+            ordered = 'True',
+            amount =  data['amount'],
+            currency = 'INR',
+        )
+        created_orderdata = RazorpayClient.create_order(self,int(data['amount']),data['currency'])
+        order_obj.save()
+        adress = Adress.objects.create(
+            first_name = data['first_name'],
+            last_name = data['last_name'],
+            order_confirmed = 'True',
+            order_details = order.objects.get(uuid = order_obj.uuid)
+        )
+        adress.save()
+        return Response({'data':created_orderdata,'Code':201},status=HTTP_201_CREATED)
+
+
 
